@@ -1,0 +1,18 @@
+#N 5                       ; number of vertices N in graph (from V1 to Vn)
+
+#E1 1 2 W1                 ; Edge 1 from vertex 1 to vertex 2, weight 1
+#E2 3 4 W1                 ; Edge 2 from vertex 3 to vertex 4, weight 1
+#E3 2 3 W1                 ; Edge 3 from vertex 2 to vertex 3, weight 1
+#E4 1 3 W1                 ; Edge 4 from vertex 1 to vertex 3, weight 4
+#E5 2 4 W5                 ; Edge 5 from vertex 2 to vertex 4, weight 5 
+#E6 3 5 W2                 ; Edge 6 from vertex 4 to vertex 5, weight 2
+#E7 1 5 W2                 ; Edge 7 from vertex 1 to vertex 5, weight 2
+
+#P1 V2 0 D V5 10  ; Package 1 at V2 from time 0, deliver to V5 on or before time 10
+#P2 V3 5 D V4 20  ; Package 2 at V3 from time 5, deliver to V4 on or before time 20
+
+#B V1 V5            ; Edge from V1 to V5 is always blocked
+#F V1 V2            ; Edge from V1 to V2 is fragile (can only be traversed once)
+#A V1               ; Normal agent starts at V1
+; #H V4               ; "Human" agent (see below)  starts at V2
+; #I V5               ; Interfering agent (see below) starts at V5
