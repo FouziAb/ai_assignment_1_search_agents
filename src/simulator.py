@@ -1,5 +1,6 @@
 from collections import defaultdict
-from agents import HumanAgent, GreedyAgent, SaboteurAgent
+from agents import GreedyAgent, SaboteurAgent, NO_OP
+from HumanAgent import HumanAgent
 from package import Package
 from graph import Graph
 
@@ -74,7 +75,7 @@ class Simulator:
             ]
 
     def run(self):
-        print(self.packages)
+        self.graph.display()
         max_run_time = max(self.packages, key=lambda x: x.deadline).deadline
         while self.future_packages() or self.active_packages or (any(agent.has_task() for agent in self.agents)):
             print(f"Time : {self.time}")
@@ -85,38 +86,23 @@ class Simulator:
                 self.update_world(agent, action)
             self.time += 1
 
-        '''while self.time <= max_run_time:
-            for agent in self.agents:
-                state = (self.graph, self.packages, self.blocked_edges, self.fragile_edges, self.time)
-                action = agent.move(state)
-                if action is not None:
-                    agent.location = action
-                self.update_world(agent, action)
-            self.time += 1
-            self.display_state()'''
-
     def update_world(self, agent, action):
         # Handle package pick up and delivery
         for package in self.active_packages:
             if package.start_v == agent.location and not package.picked_up:
-                agent.packages.add(package)
+                agent.packages.append(package)
                 package.picked_up = True
             if package in agent.packages and package.dest_v == agent.location:
                 agent.score += 1
                 self.active_packages.remove(package)
                 agent.packages.remove(package)
 
-        if action == 'no-op':
+        if action == NO_OP:
             pass
         else:
-            pass
-        
-        # Handle fragile edge blocking
-        if agent.type == "saboteur" and action is not None:
-            edge = (agent.location, action)
-            if edge in self.fragile_edges:
-                self.blocked_edges.add(edge)
-                self.fragile_edges.remove(edge)
+            agent.start_move(self, action)
+
+        agent.update()
 
     def display_state(self):
         print(f"Time: {self.time}")

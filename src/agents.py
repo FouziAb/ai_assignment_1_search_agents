@@ -1,6 +1,7 @@
 import heapq
 
 INFINITY = float("inf")
+NO_OP = -1
 
 # Dijkstra's algorithm for shortest paths
 def dijkstra(graph, start, blocked_edges):
@@ -26,7 +27,10 @@ class Agent:
         self.id = agent_id
         self.type = agent_type
         self.location = start_v
+        self.next_location = None
+        self.is_on_edge = False
         self.time = 0
+        self.score = 0
         self.next_act_time = 0
         self.packages = []
 
@@ -40,16 +44,13 @@ class Agent:
         raise NotImplementedError
     
     def display(self):
-        return f"agent_id: {self.id}, type: {self.type}, location: {self.location}, carrying_package: {self.carrying_packages}, time: self.time"
-
-# Human Agent
-class HumanAgent(Agent):
-    def act(self, state):
-        graph, packages, blocked_edges, fragile_edges, time = state
-        print(f"Current location: {self.location}")
-        print(f"State of the world: {state}")
-        move = input("Enter your move (vertex): ")
-        return int(move)
+        print(f"agent_id: {self.id}, type: {self.type}:")
+        print(f"\tlocation: {self.location}, next location {self.next_location}")
+        if not self.packages:
+            print(f"\tcarrying package: None")
+        else:
+            for i in range(len(self.packages)):
+                print(f"\t  {i}. {self.packages[i].id}")
 
 # Greedy Agent
 class GreedyAgent(Agent):
@@ -61,16 +62,9 @@ class GreedyAgent(Agent):
     def act(self, env):
         # If carrying a package, deliver it
         if self.carrying_package:
-            target = self.carrying_package['dest_v']
-            if self.location == target:
-                # Deliver package
-                print(f"Agent {self.type} delivered package to {target}.")
-                env.packages_delivered += 1
-                self.time += 1
-                self.carrying_package = None
-            else:
-                # Move toward delivery location
-                self.location = self.move_toward(target, env)
+            nearest_carryin_package = self.find_nearest_package()
+            # Move toward delivery location
+            self.location = self.move_toward(target, env)
         else:
             # If not carrying a package, pick one up if available
             for package in env.active_packages:
