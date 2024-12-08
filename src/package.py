@@ -6,3 +6,4 @@ class Package:
         self.dest_v = dest_v
         self.deadline = deadline
         self.is_delivered = False
+        self.picked_up = False

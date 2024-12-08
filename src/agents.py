@@ -28,10 +28,10 @@ class Agent:
         self.location = start_v
         self.time = 0
         self.next_act_time = 0
-        self.carrying_package  = None
+        self.packages = []
 
     def has_task(self):
-        return self.carrying_package is not None
+        return len(self.packages) != 0 
     
     def on_edge(self):
         return self.time < self.next_act_time
@@ -40,7 +40,7 @@ class Agent:
         raise NotImplementedError
     
     def display(self):
-        return f"agent_id: {self.id}, type: {self.type}, location: {self.location}, carrying_package: {self.carrying_package}, time: self.time"
+        return f"agent_id: {self.id}, type: {self.type}, location: {self.location}, carrying_package: {self.carrying_packages}, time: self.time"
 
 # Human Agent
 class HumanAgent(Agent):
@@ -53,12 +53,14 @@ class HumanAgent(Agent):
 
 # Greedy Agent
 class GreedyAgent(Agent):
-    def act(self, env):
+    def get_action(self, env):
         if self.on_edge():
-            print(f"Agent {self.type} moving")
-            self.time += 1
+            return 'no-op'
+        else:
+            return 'traverse'
+    def act(self, env):
         # If carrying a package, deliver it
-        elif self.carrying_package:
+        if self.carrying_package:
             target = self.carrying_package['dest_v']
             if self.location == target:
                 # Deliver package

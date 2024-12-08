@@ -44,7 +44,6 @@ class Simulator:
         self.graph = graph
         self.packages = packages
         self.agents = agents
-        self.num_vertices = num_vertices
         self.active_packages = []
         self.time = 0
         self.packages_delivered = []
@@ -68,6 +67,11 @@ class Simulator:
             package for package in self.active_packages
             if self.time <= package.deadline
         ]
+        for agent in self.agents:
+            agent.packages = [
+                package for package in agent.packages
+                if self.time <= package.deadline
+            ]
 
     def run(self):
         print(self.packages)
@@ -92,19 +96,20 @@ class Simulator:
             self.display_state()'''
 
     def update_world(self, agent, action):
-        if action.type == 'no-op':
-            agent.time += 1
-            return
-        elif action.type == 'pick_up':
-            pass
         # Handle package pick up and delivery
-        for package in self.packages:
-            if package['start_v'] == agent.location and not package.get('picked_up'):
-                agent.package = package
-                package['picked_up'] = True
-            if agent.package and agent.package['dest_v'] == agent.location:
+        for package in self.active_packages:
+            if package.start_v == agent.location and not package.picked_up:
+                agent.packages.add(package)
+                package.picked_up = True
+            if package in agent.packages and package.dest_v == agent.location:
                 agent.score += 1
-                self.packages.remove(agent.package)
+                self.active_packages.remove(package)
+                agent.packages.remove(package)
+
+        if action == 'no-op':
+            pass
+        else:
+            pass
         
         # Handle fragile edge blocking
         if agent.type == "saboteur" and action is not None:
@@ -120,6 +125,6 @@ class Simulator:
 
 # Main execution
 if __name__ == "__main__":
-    graph, packages, blocked_edges, fragile_edges, agents, num_vertices = parse_input_file("mapd_input.txt")
-    simulator = Simulator(graph, packages, blocked_edges, fragile_edges, agents, num_vertices)
+    graph, packages, agents = parse_input_file("mapd_input.txt")
+    simulator = Simulator(graph, packages, agents)
     simulator.run()
