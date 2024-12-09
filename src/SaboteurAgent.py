@@ -1,23 +1,16 @@
 from agents import Agent, NO_OP
 import heapq
 
-class GreedyAgent(Agent):
+class SaboteurAgent(Agent):
     def get_action(self, env):
         move = NO_OP
         if self.is_on_edge:
             return move
         else:
-            if self.packages:
-                nearest_package, path, cost = self.find_nearest_package(env, False)
-                if nearest_package:
-                    if len(path) > 1:
-                        move = path[1]
-            else:
-                # Move toward nearest package
-                nearest_package, path, cost = self.find_nearest_package(env)
-                if nearest_package:
-                    if len(path) > 1:
-                        move = path[1]
+            nearest_fragile_edge, path, cost = self.find_nearest_fragile_edge(env)
+            if nearest_fragile_edge:
+                if len(path) > 1:
+                    move = path[1]
             return move
     
     def start_move(self, env, vertex):
@@ -41,9 +34,9 @@ class GreedyAgent(Agent):
         self.display()
         self.time += 1
 
-    def find_nearest_package(self, env, is_pickup = True):
-        # Find the nearest package based on current location
-        nearest_package = None
+    def find_nearest_fragile_edge(self, env):
+        # Find the nearest fragile edge based on current location
+        nearest_fragile_edge = None
         min_distance = float('inf')
         path_min_len = float('inf')
         path = ([], min_distance)
@@ -54,25 +47,17 @@ class GreedyAgent(Agent):
                 return True
             return False
 
-        if is_pickup:
-            for package in env.active_packages:
-                if not package.picked_up:
-                    path = self.shortest_path(self.location, package.start_v, env)
-                    if path and compare_cost_len_path(path, (path_min_len, min_distance)):
-                        path_min_len = len(path[0]) - 1
-                        min_distance = path[1]
-                        nearest_package = package
-        else:
-            for package in self.packages:
-                path = self.shortest_path(self.location, package.dest_v, env)
-                if path and compare_cost_len_path(path, (path_min_len, min_distance)):
-                    path_min_len = len(path[0]) - 1
-                    min_distance = path[1]
-                    nearest_package = package
-        return nearest_package, path[0], path[1]
+        for fragile_edge in env.graph.fragile_edges_:
+            path = self.shortest_path(self.location, fragile_edge, env)
+            if path and compare_cost_len_path(path, (path_min_len, min_distance)):
+                path_min_len = len(path[0]) - 1
+                min_distance = path[1]
+                nearest_fragile_edge = fragile_edge
+        return nearest_fragile_edge, path[0], path[1]
 
-    def shortest_path(self, start, target, env):
+    def shortest_path(self, start, target_edge, env):
         # Dijkstra's algorithm for shortest path
+        target_v1, target_v2 = target_edge
         pq = [(0, start, [])]
         visited = set()
         while pq:
@@ -81,9 +66,10 @@ class GreedyAgent(Agent):
                 continue
             visited.add(vertex)
             path = path + [vertex]
-            if vertex == target:
-                return path, cost
+                
             for neighbor, weight in env.graph.edges[vertex].items():
+                if (vertex == target_v1 and neighbor == target_v2) or (vertex == target_v2 and neighbor == target_v1):
+                    return path + [neighbor], cost + weight
                 if (vertex, neighbor) not in env.graph.blocked_edges:
                     heapq.heappush(pq, (cost + weight, neighbor, path))
         return [], 0

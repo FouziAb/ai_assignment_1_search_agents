@@ -28,10 +28,13 @@ class HumanAgent(Agent):
             self.edge_wight = env.graph.edges[self.location][vertex]
             self.is_on_edge = True
 
-    def update(self):
+    def update(self, env):
         if self.is_on_edge:
             self.edge_wight -= 1
             if self.edge_wight == 0:
+                if (self.location, self.next_location) in env.graph.fragile_edges:
+                    env.graph.remove_fragile_edges((self.location, self.next_location))
+                    env.graph.add_blocked_edges((self.location, self.next_location))
                 self.is_on_edge = False
                 self.location = self.next_location
         self.display()
