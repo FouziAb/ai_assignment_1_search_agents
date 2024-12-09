@@ -7,6 +7,7 @@ class Graph:
         self.edges = defaultdict(dict)
         self.edges_ = []
         self.blocked_edges = []
+        self.blocked_edges_ = []
         self.fragile_edges = []
         self.fragile_edges_ = []
 
@@ -20,6 +21,7 @@ class Graph:
         self.edges[edge[1]][edge[0]] = weight
 
     def add_blocked_edges(self, edge):
+        self.blocked_edges_.append(edge)
         self.blocked_edges.append(edge)
         self.blocked_edges.append((edge[1], edge[0]))
     
@@ -44,9 +46,9 @@ class Graph:
             print(f"\tV{n1}\tV{n2}\t{w}")
 
         print("Blocked egdes:\n\tnode1\tnode2")
-        for n1, n2 in self.blocked_edges:
+        for n1, n2 in self.blocked_edges_:
             print(f"\tV{n1}\tV{n2}")
 
         print("Fragile egdes:\n\tnode1\tnode2")
-        for n1, n2 in self.fragile_edges:
+        for n1, n2 in self.fragile_edges_:
             print(f"\tV{n1}\tV{n2}")

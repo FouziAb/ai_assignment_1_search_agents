@@ -13,6 +13,6 @@
 
 #B V1 V5            ; Edge from V1 to V5 is always blocked
 #F V1 V2            ; Edge from V1 to V2 is fragile (can only be traversed once)
-;#A V1               ; Normal agent starts at V1
+#A V1               ; Normal agent starts at V1
 ; #H V4               ; "Human" agent (see below)  starts at V2
 #I V5               ; Interfering agent (see below) starts at V5

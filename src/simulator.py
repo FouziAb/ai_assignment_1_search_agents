@@ -91,14 +91,15 @@ class Simulator:
 
     def update_world(self, agent, action):
         # Handle package pick up and delivery
-        for package in self.active_packages:
-            if package.start_v == agent.location and not package.picked_up:
-                agent.packages.append(package)
-                package.picked_up = True
-            if package in agent.packages and package.dest_v == agent.location:
-                agent.score += 1
-                self.active_packages.remove(package)
-                agent.packages.remove(package)
+        if agent.type != 'interfering':
+            for package in self.active_packages:
+                if package.start_v == agent.location and not package.picked_up:
+                    agent.packages.append(package)
+                    package.picked_up = True
+                if package in agent.packages and package.dest_v == agent.location:
+                    agent.score += 1
+                    self.active_packages.remove(package)
+                    agent.packages.remove(package)
 
         if action == NO_OP:
             pass

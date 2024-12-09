@@ -44,31 +44,10 @@ class Agent:
         raise NotImplementedError
     
     def display(self):
-        print(f"agent_id: {self.id}, type: {self.type}:")
+        print(f"\tagent_id: {self.id}, type: {self.type}:")
         print(f"\tlocation: {self.location}, next location {self.next_location}")
         if not self.packages:
             print(f"\tcarrying package: None")
         else:
             for i in range(len(self.packages)):
-                print(f"\t  {i}. {self.packages[i].id}")
-
-class SaboteurAgent(Agent):
-    def move(self, state):
-        graph, packages, blocked_edges, fragile_edges, time = state
-        # Target nearest fragile edge
-        target = None
-        min_distance = INFINITY
-        for edge in fragile_edges:
-            if edge not in blocked_edges:
-                dist = dijkstra(graph, self.location)[edge[0]]
-                if dist < min_distance:
-                    min_distance = dist
-                    target = edge[0]
-
-        if target is not None:
-            # Compute shortest path and move to the next step
-            path = dijkstra(graph, self.location)
-            next_step = min(graph[self.location], key=lambda v: path[v])
-            return next_step
-        else:
-            return None  # No-op
+                print(f"\t{i}. {self.packages[i].id}")
