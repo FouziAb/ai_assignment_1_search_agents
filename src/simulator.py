@@ -1,7 +1,8 @@
 from collections import defaultdict
-from agents import SaboteurAgent, NO_OP
+from agents import NO_OP
 from HumanAgent import HumanAgent
 from GreedyAgent import GreedyAgent
+from SaboteurAgent import SaboteurAgent
 from package import Package
 from graph import Graph
 
@@ -86,6 +87,7 @@ class Simulator:
                 action = agent.get_action(self)
                 self.update_world(agent, action)
             self.time += 1
+        self.graph.display()
 
     def update_world(self, agent, action):
         # Handle package pick up and delivery
@@ -103,7 +105,7 @@ class Simulator:
         else:
             agent.start_move(self, action)
 
-        agent.update()
+        agent.update(self)
 
     def display_state(self):
         print(f"Time: {self.time}")
