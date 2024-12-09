@@ -1,6 +1,7 @@
 from collections import defaultdict
-from agents import GreedyAgent, SaboteurAgent, NO_OP
+from agents import SaboteurAgent, NO_OP
 from HumanAgent import HumanAgent
+from GreedyAgent import GreedyAgent
 from package import Package
 from graph import Graph
 
